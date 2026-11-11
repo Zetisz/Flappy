@@ -23,14 +23,8 @@ namespace Flappy
             Height = 50,
             Background = Brushes.GreenYellow
         };
-        private Label obstacle = new()
-        {
-            Width = 50,
-            Height = 200,
-            Background = Brushes.DarkOliveGreen
-        };
-
         private List<Label> obstacles = [];
+        private bool isGoing = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -39,14 +33,17 @@ namespace Flappy
 
         private void OnRender(object sender, EventArgs e)
         {
-            Movement();
-            ObstacleMovement();
-
-            /*
-            if (Canvas.GetTop(burd) == Canvas.(obstacle))
+            if (isGoing)
             {
-                GridMain.Children.Clear();
-            }*/
+                Movement();
+                ObstacleMovement();
+
+                /*
+                if (Canvas.GetTop(burd) == Canvas.(obstacle))
+                {
+                    GridMain.Children.Clear();
+                }*/
+            }
         }
 
         private void Movement()
@@ -66,15 +63,17 @@ namespace Flappy
 
         private void ObstacleMovement()
         {
-            double newPos = Canvas.GetRight(obstacle) + 2;
-            Canvas.SetRight(obstacle, newPos);
-
-            if (newPos > 600)
+            foreach (var obs in obstacles)
             {
-                Canvas.SetRight(obstacle, -20);
+                double newPos = Canvas.GetRight(obs) + 2;
+                Canvas.SetRight(obs, newPos);
+
+                if (newPos > 600)
+                {
+                    Canvas.SetRight(obs, -20);
+                }
             }
         }
-
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
@@ -85,15 +84,38 @@ namespace Flappy
                 Background = Brushes.AliceBlue
             };
 
-            canv.Children.Add(burd);
-            canv.Children.Add(obstacle);
-            GridMain.Children.Add(canv);
-            obstacles.Add(obstacle);
+            var spawnIndex = 0;
+            for (int i = 0; i < 6; i++) // init obstacles
+            {
+                var obstacle = new Label()
+                {
+                    Width = 70,
+                    Height = 300,
+                    Background = Brushes.DarkOliveGreen
+                };
 
+                canv.Children.Add(obstacle);
+                obstacles.Add(obstacle);
+                Canvas.SetRight(obstacle, 0 - spawnIndex * 100);
+
+                if (i % 2 == 0)
+                {
+                    Canvas.SetTop(obstacle, 0);
+                }
+                else
+                {
+                    Canvas.SetTop(obstacle, this.Height - obstacle.Height);
+                    spawnIndex++;
+                }
+                
+            }
+
+            canv.Children.Add(burd);
+            GridMain.Children.Add(canv);
             Canvas.SetLeft(burd, 150);
             Canvas.SetTop(burd, 200);
-            Canvas.SetRight(obstacle, 0);
-            Canvas.SetTop(obstacle, 0);
+
+            isGoing = true; // Game has started
         }
     }
 }
