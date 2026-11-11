@@ -20,5 +20,17 @@ namespace Flappy
         {
             InitializeComponent();
         }
+
+        private void BtnStart_Click(object sender, RoutedEventArgs e)
+        {
+            GridMain.Children.Clear();
+
+            var canv = new Canvas()
+            {
+                Background = Brushes.AliceBlue
+            };
+
+            GridMain.Children.Add(canv);
+        }
     }
 }
