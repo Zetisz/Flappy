@@ -17,18 +17,20 @@ namespace Flappy
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Label burd = new Label()
+        private Label burd = new()
         {
             Width = 50,
             Height = 50,
             Background = Brushes.GreenYellow
         };
-        private Label obstacle = new Label()
+        private Label obstacle = new()
         {
             Width = 50,
             Height = 200,
             Background = Brushes.DarkOliveGreen
         };
+
+        private List<Label> obstacles = [];
         public MainWindow()
         {
             InitializeComponent();
@@ -38,13 +40,13 @@ namespace Flappy
         private void OnRender(object sender, EventArgs e)
         {
             Movement();
+            ObstacleMovement();
 
-            double newPos = Canvas.GetRight(obstacle) + 2;
-            Canvas.SetRight(obstacle, newPos);
-
-            if (newPos > 600) {
-                Canvas.SetRight(obstacle, -20);
-            }
+            /*
+            if (Canvas.GetTop(burd) == Canvas.(obstacle))
+            {
+                GridMain.Children.Clear();
+            }*/
         }
 
         private void Movement()
@@ -62,6 +64,18 @@ namespace Flappy
             Canvas.SetTop(burd, newPos);
         }
 
+        private void ObstacleMovement()
+        {
+            double newPos = Canvas.GetRight(obstacle) + 2;
+            Canvas.SetRight(obstacle, newPos);
+
+            if (newPos > 600)
+            {
+                Canvas.SetRight(obstacle, -20);
+            }
+        }
+
+
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             GridMain.Children.Clear();
@@ -74,6 +88,7 @@ namespace Flappy
             canv.Children.Add(burd);
             canv.Children.Add(obstacle);
             GridMain.Children.Add(canv);
+            obstacles.Add(obstacle);
 
             Canvas.SetLeft(burd, 150);
             Canvas.SetTop(burd, 200);
