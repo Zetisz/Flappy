@@ -25,6 +25,12 @@ namespace Flappy
         };
         private List<Label> obstacles = [];
         private bool isGoing = false;
+        private bool canJump = true;
+        private DateTime lastJump;
+        private int jumpCooldown = 100;
+        double fallSpeed = 10;
+        double obstacleSpeed = 10;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -46,22 +52,32 @@ namespace Flappy
             }
         }
 
-        private void Movement()
+        private void Movement() // Burd movement
         {
             double newPos;
 
-            if (Keyboard.IsKeyDown(Key.Space))
+            if (Keyboard.IsKeyDown(Key.Space) && canJump)
             {
-                newPos = Canvas.GetTop(burd) - 20;
+                newPos = Canvas.GetTop(burd) - 80;
+                canJump = false;
+                lastJump = DateTime.Now;
+                fallSpeed = 10;
             }
             else
             {
-                newPos = Canvas.GetTop(burd) + 3;
+                newPos = Canvas.GetTop(burd) + (fallSpeed++ / 10);
             }
+
+            // Check jump cooldown
+            if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= jumpCooldown)
+            {
+                canJump = true;
+            }
+
             Canvas.SetTop(burd, newPos);
         }
 
-        private void ObstacleMovement()
+        private void ObstacleMovement() // Obstacle Movement
         {
             foreach (var obs in obstacles)
             {
@@ -70,12 +86,12 @@ namespace Flappy
 
                 if (newPos > 600)
                 {
-                    Canvas.SetRight(obs, -20);
+                    Canvas.SetRight(obs, -100);
                 }
             }
         }
 
-        private void BtnStart_Click(object sender, RoutedEventArgs e)
+        private void BtnStart_Click(object sender, RoutedEventArgs e) // Start Game & Setup
         {
             GridMain.Children.Clear();
 
@@ -85,7 +101,7 @@ namespace Flappy
             };
 
             var spawnIndex = 0;
-            for (int i = 0; i < 6; i++) // init obstacles
+            for (int i = 0; i < 2; i++) // init obstacles
             {
                 var obstacle = new Label()
                 {
