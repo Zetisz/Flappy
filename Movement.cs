@@ -16,7 +16,7 @@ namespace Flappy
         int flapHeight = 80;
         double fallSpeed = 10;
         double obstacleSpeed = 1000;
-        internal void Move(Label burd) // Burd movement
+        internal void BurdMovement(Label burd) // Burd movement
         {
             double newPos;
 
@@ -46,27 +46,22 @@ namespace Flappy
             Canvas.SetTop(burd, newPos);
         }
 
-        internal void ObstacleMovement(List<Label> obstacles) // Obstacle Movement
+        internal void PipeMovement(Pipe pipe)
         {
             int randomX = rand.Next(-200, 200); // random num for height change
-            for (int i = 0; i < obstacles.Count(); i++)
+
+            // Speed up
+            Canvas.SetRight(pipe.Top, Canvas.GetRight(pipe.Top) + obstacleSpeed++ / 1000);
+            Canvas.SetRight(pipe.Bottom, Canvas.GetRight(pipe.Bottom) + obstacleSpeed++ / 1000);
+
+            // If pipe goes out of screen
+            if (Canvas.GetRight(pipe.Top) > 600)
             {
-                double newPos = Canvas.GetRight(obstacles[i]) + obstacleSpeed++ / 1000; // speeds up over time
-                Canvas.SetRight(obstacles[i], newPos);
+                Canvas.SetRight(pipe.Top, -100);
+                Canvas.SetRight(pipe.Bottom, -100);
 
-                if (newPos > 600)
-                {
-                    Canvas.SetRight(obstacles[i], -100);
-
-                    if (i % 2 == 0)
-                    {
-                        Canvas.SetTop(obstacles[i], -200 + randomX);
-                    }
-                    else
-                    {
-                        Canvas.SetTop(obstacles[i], 500 - randomX);
-                    }
-                }
+                Canvas.SetTop(pipe.Top, -200 + randomX);
+                Canvas.SetTop(pipe.Bottom, 500 - randomX);
             }
         }
     }

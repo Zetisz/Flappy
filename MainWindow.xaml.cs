@@ -17,22 +17,15 @@ namespace Flappy
     /// </summary>
     public partial class MainWindow : Window
     {
-        
         Movement movementSys;
-        Label burd = new()
-        {
-            Width = 50,
-            Height = 50,
-            Background = Brushes.GreenYellow
-        };
-        List<Label> obstacles = [];
+        Pipe pipe;
+        Label burd;
         bool isGoing = false;
         
-        
-
         public MainWindow()
         {
             InitializeComponent();
+            movementSys = new Movement();
             CompositionTarget.Rendering += OnRender;
         }
 
@@ -40,8 +33,8 @@ namespace Flappy
         {
             if (isGoing)
             {
-                movementSys.Move(burd);
-                movementSys.ObstacleMovement(obstacles);
+                movementSys.BurdMovement(burd);
+                movementSys.PipeMovement(pipe);
                 IsColliding();
             }
         }
@@ -50,8 +43,8 @@ namespace Flappy
         private void IsColliding()
         {
             var burdRect = new Rect(Canvas.GetRight(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
-            var pipeTopRect = new Rect(Canvas.GetRight(obstacles[0]), Canvas.GetTop(obstacles[0]), obstacles[0].Width, obstacles[0].Height);
-            var pipeBottomRect = new Rect(Canvas.GetRight(obstacles[1]), Canvas.GetTop(obstacles[1]), obstacles[1].Width, obstacles[1].Height);
+            var pipeTopRect = new Rect(Canvas.GetRight(pipe.Top), Canvas.GetTop(pipe.Top), pipe.Top.Width, pipe.Top.Height);
+            var pipeBottomRect = new Rect(Canvas.GetRight(pipe.Bottom), Canvas.GetTop(pipe.Bottom), pipe.Bottom.Width, pipe.Bottom.Height);
 
             if (burdRect.IntersectsWith(pipeBottomRect) || burdRect.IntersectsWith(pipeTopRect))
             {
@@ -66,36 +59,44 @@ namespace Flappy
 
             var canv = new Canvas() { Background = Brushes.AliceBlue };
 
-            var spawnIndex = 0;
-            for (int i = 0; i < 2; i++) // init obstacles
+            // init burd
+            burd = new()
             {
-                var obstacle = new Label()
-                {
-                    Width = 70,
-                    Height = 500,
-                    Background = Brushes.DarkOliveGreen
-                };
-
-                canv.Children.Add(obstacle);
-                obstacles.Add(obstacle);
-                Canvas.SetRight(obstacle, 0 - spawnIndex * 100);
-
-                if (i % 2 == 0)
-                {
-                    Canvas.SetTop(obstacle, -200);
-                }
-                else
-                {
-                    Canvas.SetTop(obstacle, 500);
-                    spawnIndex++;
-                }
-                
-            }
+                Width = 50,
+                Height = 50,
+                Background = Brushes.GreenYellow
+            };
 
             canv.Children.Add(burd);
             GridMain.Children.Add(canv);
             Canvas.SetRight(burd, this.Width - 150);
             Canvas.SetTop(burd, 200);
+
+            // init pipe
+
+            var part = new Rectangle()
+            {
+                Width = 70,
+                Height = 500,
+                Fill = Brushes.DarkOliveGreen
+            };
+
+            var part2 = new Rectangle()
+            {
+                Width = 70,
+                Height = 500,
+                Fill = Brushes.DarkOliveGreen
+            };
+
+            pipe = new Pipe(part, part2);
+            canv.Children.Add(pipe.Top);
+            canv.Children.Add(pipe.Bottom);
+
+            Canvas.SetRight(pipe.Top, 0);
+            Canvas.SetRight(pipe.Bottom, 0);
+
+            Canvas.SetTop(pipe.Top, -200);
+            Canvas.SetTop(pipe.Bottom, 500);
 
             isGoing = true; // Game has started
         }
