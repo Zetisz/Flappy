@@ -17,19 +17,22 @@ namespace Flappy
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Label burd = new()
+        Random rand = new Random();
+        Label burd = new()
         {
             Width = 50,
             Height = 50,
             Background = Brushes.GreenYellow
         };
-        private List<Label> obstacles = [];
-        private bool isGoing = false;
-        private bool canJump = true;
-        private DateTime lastJump;
-        private int jumpCooldown = 100;
+        List<Label> obstacles = [];
+        bool isGoing = false;
+        bool canJump = true;
+        DateTime lastJump;
+        int flapCooldown = 200;
+        int flapHeight = 80;
         double fallSpeed = 10;
-        double obstacleSpeed = 10;
+        double obstacleSpeed = 1000;
+        
 
         public MainWindow()
         {
@@ -56,20 +59,20 @@ namespace Flappy
         {
             double newPos;
 
-            if (Keyboard.IsKeyDown(Key.Space) && canJump)
+            if (Keyboard.IsKeyDown(Key.Space) && canJump && (Canvas.GetTop(burd) - flapHeight > 0)) // flap
             {
-                newPos = Canvas.GetTop(burd) - 80;
+                newPos = Canvas.GetTop(burd) - flapHeight;
                 canJump = false;
                 lastJump = DateTime.Now;
                 fallSpeed = 10;
             }
             else
             {
-                newPos = Canvas.GetTop(burd) + (fallSpeed++ / 10);
+                newPos = Canvas.GetTop(burd) + (fallSpeed++ / 10); // Exponential fall speed
             }
 
             // Check jump cooldown
-            if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= jumpCooldown)
+            if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= flapCooldown)
             {
                 canJump = true;
             }
@@ -79,14 +82,24 @@ namespace Flappy
 
         private void ObstacleMovement() // Obstacle Movement
         {
-            foreach (var obs in obstacles)
+            int randomX = rand.Next(-200, 200);
+            for (int i = 0; i < obstacles.Count(); i++)
             {
-                double newPos = Canvas.GetRight(obs) + 2;
-                Canvas.SetRight(obs, newPos);
+                double newPos = Canvas.GetRight(obstacles[i]) + obstacleSpeed++ / 1000;
+                Canvas.SetRight(obstacles[i], newPos);
 
                 if (newPos > 600)
                 {
-                    Canvas.SetRight(obs, -100);
+                    Canvas.SetRight(obstacles[i], -100);
+                    
+                    if (i % 2 == 0)
+                    {
+                        Canvas.SetTop(obstacles[i], (20 - obstacles[i].Height / 2) + randomX);
+                    }
+                    else
+                    {
+                        Canvas.SetBottom(obstacles[i], (20 - obstacles[i].Height / 2) - randomX);
+                    }
                 }
             }
         }
@@ -106,7 +119,7 @@ namespace Flappy
                 var obstacle = new Label()
                 {
                     Width = 70,
-                    Height = 300,
+                    Height = 500,
                     Background = Brushes.DarkOliveGreen
                 };
 
@@ -116,11 +129,11 @@ namespace Flappy
 
                 if (i % 2 == 0)
                 {
-                    Canvas.SetTop(obstacle, 0);
+                    Canvas.SetTop(obstacle, 20 - obstacle.Height / 2);
                 }
                 else
                 {
-                    Canvas.SetTop(obstacle, this.Height - obstacle.Height);
+                    Canvas.SetBottom(obstacle, 20 - obstacle.Height / 2);
                     spawnIndex++;
                 }
                 
