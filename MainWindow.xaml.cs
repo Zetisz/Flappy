@@ -17,7 +17,8 @@ namespace Flappy
     /// </summary>
     public partial class MainWindow : Window
     {
-        Random rand = new Random();
+        
+        Movement movementSys;
         Label burd = new()
         {
             Width = 50,
@@ -26,12 +27,7 @@ namespace Flappy
         };
         List<Label> obstacles = [];
         bool isGoing = false;
-        bool canJump = true;
-        DateTime lastJump;
-        int flapCooldown = 200;
-        int flapHeight = 80;
-        double fallSpeed = 10;
-        double obstacleSpeed = 1000;
+        
         
 
         public MainWindow()
@@ -44,63 +40,23 @@ namespace Flappy
         {
             if (isGoing)
             {
-                Movement();
-                ObstacleMovement();
-
-                /*
-                if (Canvas.GetTop(burd) == Canvas.(obstacle))
-                {
-                    GridMain.Children.Clear();
-                }*/
+                movementSys.Move(burd);
+                movementSys.ObstacleMovement(obstacles);
+                IsColliding();
             }
         }
 
-        private void Movement() // Burd movement
+
+        private void IsColliding()
         {
-            double newPos;
+            var burdRect = new Rect(Canvas.GetRight(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
+            var pipeTopRect = new Rect(Canvas.GetRight(obstacles[0]), Canvas.GetTop(obstacles[0]), obstacles[0].Width, obstacles[0].Height);
+            var pipeBottomRect = new Rect(Canvas.GetRight(obstacles[1]), Canvas.GetTop(obstacles[1]), obstacles[1].Width, obstacles[1].Height);
 
-            if (Keyboard.IsKeyDown(Key.Space) && canJump && (Canvas.GetTop(burd) - flapHeight > 0)) // flap
+            if (burdRect.IntersectsWith(pipeBottomRect) || burdRect.IntersectsWith(pipeTopRect))
             {
-                newPos = Canvas.GetTop(burd) - flapHeight;
-                canJump = false;
-                lastJump = DateTime.Now;
-                fallSpeed = 10;
-            }
-            else
-            {
-                newPos = Canvas.GetTop(burd) + (fallSpeed++ / 10); // Exponential fall speed
-            }
-
-            // Check jump cooldown
-            if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= flapCooldown)
-            {
-                canJump = true;
-            }
-
-            Canvas.SetTop(burd, newPos);
-        }
-
-        private void ObstacleMovement() // Obstacle Movement
-        {
-            int randomX = rand.Next(-200, 200);
-            for (int i = 0; i < obstacles.Count(); i++)
-            {
-                double newPos = Canvas.GetRight(obstacles[i]) + obstacleSpeed++ / 1000;
-                Canvas.SetRight(obstacles[i], newPos);
-
-                if (newPos > 600)
-                {
-                    Canvas.SetRight(obstacles[i], -100);
-                    
-                    if (i % 2 == 0)
-                    {
-                        Canvas.SetTop(obstacles[i], (20 - obstacles[i].Height / 2) + randomX);
-                    }
-                    else
-                    {
-                        Canvas.SetBottom(obstacles[i], (20 - obstacles[i].Height / 2) - randomX);
-                    }
-                }
+                isGoing = false;
+                MessageBox.Show("Game Over!");
             }
         }
 
@@ -108,10 +64,7 @@ namespace Flappy
         {
             GridMain.Children.Clear();
 
-            var canv = new Canvas()
-            {
-                Background = Brushes.AliceBlue
-            };
+            var canv = new Canvas() { Background = Brushes.AliceBlue };
 
             var spawnIndex = 0;
             for (int i = 0; i < 2; i++) // init obstacles
@@ -129,11 +82,11 @@ namespace Flappy
 
                 if (i % 2 == 0)
                 {
-                    Canvas.SetTop(obstacle, 20 - obstacle.Height / 2);
+                    Canvas.SetTop(obstacle, -200);
                 }
                 else
                 {
-                    Canvas.SetBottom(obstacle, 20 - obstacle.Height / 2);
+                    Canvas.SetTop(obstacle, 500);
                     spawnIndex++;
                 }
                 
@@ -141,7 +94,7 @@ namespace Flappy
 
             canv.Children.Add(burd);
             GridMain.Children.Add(canv);
-            Canvas.SetLeft(burd, 150);
+            Canvas.SetRight(burd, this.Width - 150);
             Canvas.SetTop(burd, 200);
 
             isGoing = true; // Game has started
