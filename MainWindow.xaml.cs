@@ -55,7 +55,8 @@ namespace Flappy
                 {
                     Content = "Game Over",
                     FontSize = 60,
-                    HorizontalAlignment = HorizontalAlignment.Center
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 40, 0, 0)
                 };
 
                 var lblScore = new Label
@@ -63,7 +64,7 @@ namespace Flappy
                     Content = "Score: " + score,
                     FontSize = 60,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(50)
+                    Margin = new Thickness(0, 120, 0, 0)
                 };
 
                 var btnPlayAgain = new Button
