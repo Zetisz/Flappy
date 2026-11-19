@@ -19,7 +19,7 @@ namespace Flappy
         private double pipeSpeed = 2;
         private DateTime lastFrame = DateTime.Now;
         
-        internal bool BurdMovement(Rectangle burd) // Burd movement
+        internal bool BurdMovement(Image burd) // Burd movement
         {
             var currentFrame = DateTime.Now;
             var deltaTime = (currentFrame - lastFrame).TotalSeconds;

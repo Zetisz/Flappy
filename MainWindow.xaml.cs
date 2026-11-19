@@ -18,7 +18,7 @@ namespace Flappy
     public partial class MainWindow : Window
     {
         private Movement movementSys;
-        private Rectangle burd;
+        private Image burd;
         private Label LblScore;
         private bool isGoing;
         private bool afterStart;
@@ -113,11 +113,12 @@ namespace Flappy
 
             // init burd
             
-            burd = new Rectangle
+            burd = new Image
             {
                 Width = 50,
                 Height = 50,
-                Fill = Brushes.GreenYellow
+                Source = new BitmapImage(new Uri("pack://application:,,,/imgs/burd-test.png")),
+                Stretch = Stretch.Fill
             };
 
             canv.Children.Add(burd);
@@ -129,18 +130,20 @@ namespace Flappy
             
             for (var i = 0; i < pipeNumber; i++) // init obstacles
             {
-                var part1 = new Rectangle
+                var part1 = new Image
                 {
                     Width = 70,
                     Height = 500,
-                    Fill = Brushes.DarkOliveGreen
+                    Source = new BitmapImage(new Uri("pack://application:,,,/imgs/pipe-top.png")),
+                    Stretch = Stretch.Fill
                 };
                 
-                var part2 = new Rectangle
+                var part2 = new Image
                 {
                     Width = 70,
                     Height = 500,
-                    Fill = Brushes.DarkOliveGreen
+                    Source = new BitmapImage(new Uri("pack://application:,,,/imgs/pipe-bottom.png")),
+                    Stretch = Stretch.Fill
                 };
 
                 var pipe = new Pipe(part1, part2);
