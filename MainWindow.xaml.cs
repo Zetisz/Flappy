@@ -21,9 +21,10 @@ namespace Flappy
         private Rectangle burd;
         private Label LblScore;
         private bool isGoing;
+        private bool afterStart;
         private List<Pipe> pipes = [];
-        private int pipeNumber = 2;
-        private int score = 0;
+        int pipeNumber = 2;
+        private int score;
         
         public MainWindow()
         {
@@ -36,18 +37,52 @@ namespace Flappy
         {
             if (isGoing)
             {
-                movementSys.BurdMovement(burd);
+                isGoing = movementSys.BurdMovement(burd);
                 
                 foreach (var pipe in pipes)
                 {
                     movementSys.PipeMovement(pipe, pipes);
-                    IsColliding(pipe);
+                    isGoing = isGoing && IsColliding(pipe);
                 }
             }
+            else if (afterStart) // End Game
+            {
+                GridMain.Children.Clear();
+                afterStart = false;
+                movementSys.ResetMovement();
+
+                var lblGameOver = new Label
+                {
+                    Content = "Game Over",
+                    FontSize = 60,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+
+                var lblScore = new Label
+                {
+                    Content = "Score: " + score,
+                    FontSize = 60,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(50)
+                };
+
+                var btnPlayAgain = new Button
+                {
+                    Content = "Play Again",
+                    FontSize = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Height = 100,
+                    Width = 200
+                };
+                
+                btnPlayAgain.Click += BtnStart_Click;
+                GridMain.Children.Add(lblGameOver);
+                GridMain.Children.Add(lblScore);
+                GridMain.Children.Add(btnPlayAgain);
+            }
         }
-
-
-        private void IsColliding(Pipe pipe)
+        
+        private bool IsColliding(Pipe pipe)
         {
             var burdRect = new Rect(Canvas.GetLeft(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
             var pipeTopRect = new Rect(Canvas.GetLeft(pipe.Top), Canvas.GetTop(pipe.Top), pipe.Top.Width, pipe.Top.Height);
@@ -55,8 +90,7 @@ namespace Flappy
 
             if (burdRect.IntersectsWith(pipeBottomRect) || burdRect.IntersectsWith(pipeTopRect))
             {
-                isGoing = false;
-                MessageBox.Show("Game Over!");
+                return false;
             }
             if (!pipe.HasScored && Canvas.GetLeft(pipe.Top) + pipe.Top.Width < Canvas.GetLeft(burd))
             {
@@ -64,6 +98,8 @@ namespace Flappy
                 LblScore.Content = score.ToString();
                 pipe.HasScored = true;
             }
+
+            return true;
         }
 
         private void BtnStart_Click(object sender, RoutedEventArgs e) // Start Game & Setup
@@ -134,7 +170,10 @@ namespace Flappy
 
             canv.Children.Add(LblScore);
             
+            afterStart = true;
             isGoing = true; // Game has started
         }
+
+        
     }
 }

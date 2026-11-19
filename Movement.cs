@@ -19,7 +19,7 @@ namespace Flappy
         private double pipeSpeed = 2;
         private DateTime lastFrame = DateTime.Now;
         
-        internal void BurdMovement(Rectangle burd) // Burd movement
+        internal bool BurdMovement(Rectangle burd) // Burd movement
         {
             var currentFrame = DateTime.Now;
             var deltaTime = (currentFrame - lastFrame).TotalSeconds;
@@ -28,12 +28,7 @@ namespace Flappy
             
             deltaTime = Math.Min(deltaTime, 0.05);
 
-            if (Canvas.GetTop(burd) >= 800) // Game Over
-            {
-                MessageBox.Show("Game Over");
-            }
-
-            if (Keyboard.IsKeyDown(Key.Space) && canJump && (Canvas.GetTop(burd) - flapStrength > 0)) // flap
+            if (Keyboard.IsKeyDown(Key.Space) && canJump && currentPos - flapStrength > 0) // flap
             {
                 velocity = -flapStrength;
                 canJump = false;
@@ -51,6 +46,8 @@ namespace Flappy
             currentPos += velocity * deltaTime;
 
             Canvas.SetTop(burd, currentPos);
+            
+            return currentPos < 800;
         }
 
         internal void PipeMovement(Pipe pipe, List<Pipe> pipes)
@@ -87,6 +84,13 @@ namespace Flappy
                 
                 pipe.HasScored = false;
             }
+        }
+
+        internal void ResetMovement()
+        {
+            canJump = true;
+            velocity = 0;
+            pipeSpeed = 2;
         }
     }
 }
