@@ -10,5 +10,7 @@ namespace Flappy
     {
         public Rectangle Top { get; set; } = top;
         public Rectangle Bottom { get; set; } = bottom;
+        
+        public bool HasScored { get; set; } = false;
     }
 }

@@ -39,7 +39,7 @@ namespace Flappy
                 newPos = Canvas.GetTop(burd) + (gravity++ / 20); // Exponential fall speed
             }
 
-            // Check jump cooldown
+            // Check flap cooldown
             if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= flapCooldown)
             {
                 canJump = true;
@@ -79,6 +79,8 @@ namespace Flappy
 
                 Canvas.SetTop(pipe.Top, -200 + randomY);
                 Canvas.SetTop(pipe.Bottom, 500 + randomY);
+                
+                pipe.HasScored = false;
             }
         }
     }

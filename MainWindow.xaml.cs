@@ -19,9 +19,11 @@ namespace Flappy
     {
         private Movement movementSys;
         private Rectangle burd;
+        private Label LblScore;
         private bool isGoing;
         private List<Pipe> pipes = [];
         private int pipeNumber = 2;
+        private int score = 0;
         
         public MainWindow()
         {
@@ -56,16 +58,24 @@ namespace Flappy
                 isGoing = false;
                 MessageBox.Show("Game Over!");
             }
+            if (!pipe.HasScored && Canvas.GetLeft(pipe.Top) + pipe.Top.Width < Canvas.GetLeft(burd))
+            {
+                score++;
+                LblScore.Content = score.ToString();
+                pipe.HasScored = true;
+            }
         }
 
         private void BtnStart_Click(object sender, RoutedEventArgs e) // Start Game & Setup
         {
             GridMain.Children.Clear();
             pipes.Clear();
+            score = 0;
 
             var canv = new Canvas { Background = Brushes.AliceBlue };
 
             // init burd
+            
             burd = new Rectangle
             {
                 Width = 50,
@@ -107,6 +117,23 @@ namespace Flappy
                 Canvas.SetTop(pipe.Bottom, 500);
                 pipes.Add(pipe);
             }
+            
+            // init score label
+            
+            LblScore = new Label
+            {
+                Content = "0",
+                FontSize = 60,
+                Foreground = Brushes.Gray,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            Canvas.SetLeft(LblScore, 20);
+            Canvas.SetTop(LblScore, 20);
+
+            canv.Children.Add(LblScore);
+            
             isGoing = true; // Game has started
         }
     }
