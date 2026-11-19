@@ -14,6 +14,7 @@ namespace Flappy
         bool canJump = true;
         private int flapStrength = 300;
         private double gravity = 800;
+        double flapCooldown;
         private double velocity;
         private double pipeSpeed = 2;
         private DateTime lastFrame = DateTime.Now;
@@ -36,10 +37,11 @@ namespace Flappy
             {
                 velocity = -flapStrength;
                 canJump = false;
+                flapCooldown = 0;
             }
             
             // Allow another flap after releasing Space
-            if (!Keyboard.IsKeyDown(Key.Space))
+            if (!Keyboard.IsKeyDown(Key.Space) || ++flapCooldown > 30)
             {
                 canJump = true;
             }
@@ -57,7 +59,7 @@ namespace Flappy
             Canvas.SetLeft(pipe.Bottom, Canvas.GetLeft(pipe.Bottom) - pipeSpeed);
 
             // If pipe goes out of screen
-            if (Canvas.GetLeft(pipe.Top) < 0 - pipe.Top.Width)
+            if (Canvas.GetLeft(pipe.Top) < -pipe.Top.Width)
             {
                 // Find the pipe furthest to the right
                 var furthestRight = double.MaxValue;
