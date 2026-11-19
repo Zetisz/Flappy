@@ -17,10 +17,11 @@ namespace Flappy
     /// </summary>
     public partial class MainWindow : Window
     {
-        Movement movementSys;
-        Pipe pipe;
-        Label burd;
-        bool isGoing = false;
+        private Movement movementSys;
+        private Label burd;
+        private bool isGoing;
+        private List<Pipe> pipes = [];
+        private int pipeNumber = 2;
         
         public MainWindow()
         {
@@ -34,13 +35,17 @@ namespace Flappy
             if (isGoing)
             {
                 movementSys.BurdMovement(burd);
-                movementSys.PipeMovement(pipe);
-                IsColliding();
+                
+                foreach (var pipe in pipes)
+                {
+                    movementSys.PipeMovement(pipe, pipes);
+                    IsColliding(pipe);
+                }
             }
         }
 
 
-        private void IsColliding()
+        private void IsColliding(Pipe pipe)
         {
             var burdRect = new Rect(Canvas.GetRight(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
             var pipeTopRect = new Rect(Canvas.GetRight(pipe.Top), Canvas.GetTop(pipe.Top), pipe.Top.Width, pipe.Top.Height);
@@ -56,11 +61,12 @@ namespace Flappy
         private void BtnStart_Click(object sender, RoutedEventArgs e) // Start Game & Setup
         {
             GridMain.Children.Clear();
+            pipes.Clear();
 
             var canv = new Canvas() { Background = Brushes.AliceBlue };
 
             // init burd
-            burd = new()
+            burd = new Label
             {
                 Width = 50,
                 Height = 50,
@@ -73,31 +79,34 @@ namespace Flappy
             Canvas.SetTop(burd, 200);
 
             // init pipe
-
-            var part = new Rectangle()
+            
+            for (var i = 0; i < pipeNumber; i++) // init obstacles
             {
-                Width = 70,
-                Height = 500,
-                Fill = Brushes.DarkOliveGreen
-            };
+                var part1 = new Rectangle
+                {
+                    Width = 70,
+                    Height = 500,
+                    Fill = Brushes.DarkOliveGreen
+                };
+                
+                var part2 = new Rectangle
+                {
+                    Width = 70,
+                    Height = 500,
+                    Fill = Brushes.DarkOliveGreen
+                };
 
-            var part2 = new Rectangle()
-            {
-                Width = 70,
-                Height = 500,
-                Fill = Brushes.DarkOliveGreen
-            };
+                var pipe = new Pipe(part1, part2);
 
-            pipe = new Pipe(part, part2);
-            canv.Children.Add(pipe.Top);
-            canv.Children.Add(pipe.Bottom);
-
-            Canvas.SetRight(pipe.Top, 0);
-            Canvas.SetRight(pipe.Bottom, 0);
-
-            Canvas.SetTop(pipe.Top, -200);
-            Canvas.SetTop(pipe.Bottom, 500);
-
+                canv.Children.Add(pipe.Top);
+                canv.Children.Add(pipe.Bottom);
+                
+                Canvas.SetRight(pipe.Top, -i * 350);
+                Canvas.SetRight(pipe.Bottom, -i * 350);
+                Canvas.SetTop(pipe.Top, -200);
+                Canvas.SetTop(pipe.Bottom, 500);
+                pipes.Add(pipe);
+            }
             isGoing = true; // Game has started
         }
     }
