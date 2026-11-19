@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace Flappy
 {
@@ -15,8 +16,9 @@ namespace Flappy
         int flapCooldown = 200;
         private int flapHeight = 80;
         double gravity = 3;
-        double obstacleSpeed = 1000;
-        internal void BurdMovement(Label burd) // Burd movement
+        double pipeSpeed = 2;
+        
+        internal void BurdMovement(Rectangle burd) // Burd movement
         {
             double newPos;
 
@@ -48,33 +50,32 @@ namespace Flappy
 
         internal void PipeMovement(Pipe pipe, List<Pipe> pipes)
         {
-            // Speed up
-            Canvas.SetRight(pipe.Top, Canvas.GetRight(pipe.Top) + obstacleSpeed++ / 10000);
-            Canvas.SetRight(pipe.Bottom, Canvas.GetRight(pipe.Bottom) + obstacleSpeed++ / 10000);
+            Canvas.SetLeft(pipe.Top, Canvas.GetLeft(pipe.Top) - pipeSpeed);
+            Canvas.SetLeft(pipe.Bottom, Canvas.GetLeft(pipe.Bottom) - pipeSpeed);
 
             // If pipe goes out of screen
-            if (Canvas.GetRight(pipe.Top) > 600)
+            if (Canvas.GetLeft(pipe.Top) < 0 - pipe.Top.Width)
             {
                 // Find the pipe furthest to the right
                 var furthestRight = double.MaxValue;
                 
-                foreach (Pipe otherPipe in pipes)
+                foreach (var otherPipe in pipes)
                 {
                     if (otherPipe != pipe)
                     {
-                        var otherRight = Canvas.GetRight(otherPipe.Top);
+                        var otherRight = Canvas.GetLeft(otherPipe.Top);
 
                         if (otherRight < furthestRight)
                             furthestRight = otherRight;
                     }
                 }
                 
-                // Position this pipe behind the other pipe
-                Canvas.SetRight(pipe.Top, furthestRight - 350);
-                Canvas.SetRight(pipe.Bottom, furthestRight - 350);
+                // Pos the pipe behind the other pipe
+                Canvas.SetLeft(pipe.Top, furthestRight + 350);
+                Canvas.SetLeft(pipe.Bottom, furthestRight + 350);
 
-                // Generate a random vertical offset
-                var randomY = rand.Next(-100, 101);
+                // random vertical offset
+                var randomY = rand.Next(-200, 200);
 
                 Canvas.SetTop(pipe.Top, -200 + randomY);
                 Canvas.SetTop(pipe.Bottom, 500 + randomY);

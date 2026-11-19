@@ -18,7 +18,7 @@ namespace Flappy
     public partial class MainWindow : Window
     {
         private Movement movementSys;
-        private Label burd;
+        private Rectangle burd;
         private bool isGoing;
         private List<Pipe> pipes = [];
         private int pipeNumber = 2;
@@ -47,9 +47,9 @@ namespace Flappy
 
         private void IsColliding(Pipe pipe)
         {
-            var burdRect = new Rect(Canvas.GetRight(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
-            var pipeTopRect = new Rect(Canvas.GetRight(pipe.Top), Canvas.GetTop(pipe.Top), pipe.Top.Width, pipe.Top.Height);
-            var pipeBottomRect = new Rect(Canvas.GetRight(pipe.Bottom), Canvas.GetTop(pipe.Bottom), pipe.Bottom.Width, pipe.Bottom.Height);
+            var burdRect = new Rect(Canvas.GetLeft(burd), Canvas.GetTop(burd), burd.Width, burd.Height);
+            var pipeTopRect = new Rect(Canvas.GetLeft(pipe.Top), Canvas.GetTop(pipe.Top), pipe.Top.Width, pipe.Top.Height);
+            var pipeBottomRect = new Rect(Canvas.GetLeft(pipe.Bottom), Canvas.GetTop(pipe.Bottom), pipe.Bottom.Width, pipe.Bottom.Height);
 
             if (burdRect.IntersectsWith(pipeBottomRect) || burdRect.IntersectsWith(pipeTopRect))
             {
@@ -63,19 +63,19 @@ namespace Flappy
             GridMain.Children.Clear();
             pipes.Clear();
 
-            var canv = new Canvas() { Background = Brushes.AliceBlue };
+            var canv = new Canvas { Background = Brushes.AliceBlue };
 
             // init burd
-            burd = new Label
+            burd = new Rectangle
             {
                 Width = 50,
                 Height = 50,
-                Background = Brushes.GreenYellow
+                Fill = Brushes.GreenYellow
             };
 
             canv.Children.Add(burd);
             GridMain.Children.Add(canv);
-            Canvas.SetRight(burd, this.Width - 150);
+            Canvas.SetLeft(burd, 0 + 150);
             Canvas.SetTop(burd, 200);
 
             // init pipe
@@ -101,8 +101,8 @@ namespace Flappy
                 canv.Children.Add(pipe.Top);
                 canv.Children.Add(pipe.Bottom);
                 
-                Canvas.SetRight(pipe.Top, -i * 350);
-                Canvas.SetRight(pipe.Bottom, -i * 350);
+                Canvas.SetLeft(pipe.Top,  Width * (pipeNumber - i));
+                Canvas.SetLeft(pipe.Bottom,  Width *  (pipeNumber - i));
                 Canvas.SetTop(pipe.Top, -200);
                 Canvas.SetTop(pipe.Bottom, 500);
                 pipes.Add(pipe);
