@@ -12,40 +12,43 @@ namespace Flappy
     {
         Random rand = new();
         bool canJump = true;
-        DateTime lastJump;
-        int flapCooldown = 200;
-        private int flapHeight = 80;
-        double gravity = 3;
-        double pipeSpeed = 2;
+        private int flapStrength = 300;
+        private double gravity = 800;
+        private double velocity;
+        private double pipeSpeed = 2;
+        private DateTime lastFrame = DateTime.Now;
         
         internal void BurdMovement(Rectangle burd) // Burd movement
         {
-            double newPos;
+            var currentFrame = DateTime.Now;
+            var deltaTime = (currentFrame - lastFrame).TotalSeconds;
+            lastFrame = currentFrame;
+            var currentPos = Canvas.GetTop(burd);
+            
+            deltaTime = Math.Min(deltaTime, 0.05);
 
             if (Canvas.GetTop(burd) >= 800) // Game Over
             {
                 MessageBox.Show("Game Over");
             }
 
-            if (Keyboard.IsKeyDown(Key.Space) && canJump && (Canvas.GetTop(burd) - flapHeight > 0)) // flap
+            if (Keyboard.IsKeyDown(Key.Space) && canJump && (Canvas.GetTop(burd) - flapStrength > 0)) // flap
             {
-                newPos = Canvas.GetTop(burd) - flapHeight;
+                velocity = -flapStrength;
                 canJump = false;
-                lastJump = DateTime.Now;
-                gravity = 3;
             }
-            else
-            {
-                newPos = Canvas.GetTop(burd) + (gravity++ / 20); // Exponential fall speed
-            }
-
-            // Check flap cooldown
-            if (!canJump && (DateTime.Now - lastJump).TotalMilliseconds >= flapCooldown)
+            
+            // Allow another flap after releasing Space
+            if (!Keyboard.IsKeyDown(Key.Space))
             {
                 canJump = true;
             }
+            
+            // Apply forces
+            velocity += gravity * deltaTime;
+            currentPos += velocity * deltaTime;
 
-            Canvas.SetTop(burd, newPos);
+            Canvas.SetTop(burd, currentPos);
         }
 
         internal void PipeMovement(Pipe pipe, List<Pipe> pipes)
